@@ -33,7 +33,7 @@ namespace tk { namespace dnn {
     }
 
     bool darknetParseFields(const std::string& line, darknetFields_t& fields){
-
+	std::cout << line << std::endl;
         std::string name,value;
         if(!divideNameAndValue(line, name, value))
             return false;
@@ -223,6 +223,7 @@ namespace tk { namespace dnn {
 
         darknetFields_t fields; // will be filled with layers fields
         std::string line;
+	int layer_count=0;
         while(std::getline(if_cfg, line)) {
             // remove comments
             std::size_t found = line.find("#");
@@ -240,8 +241,11 @@ namespace tk { namespace dnn {
                 if(fields.type != "") {
                     if(fields.type == "net")
                         net = darknetAddNet(fields);
-                    else
+                    else {
                         darknetAddLayer(net, fields, wgs_path, netLayers, names);
+			std::cout << net->num_layers << ".* " << fields.type << std::endl;
+			++layer_count;
+		    }
                 }
 
                 // new type
@@ -261,6 +265,8 @@ namespace tk { namespace dnn {
         // end of filled type
         if(fields.type != "") {
             darknetAddLayer(net, fields, wgs_path, netLayers, names);
+	    std::cout << net->num_layers << ". " << fields.type << std::endl;
+            ++layer_count;
         }
 
         if(net == nullptr) {
